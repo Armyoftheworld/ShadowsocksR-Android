@@ -1,7 +1,20 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
+Properties prop = new Properties()
+InputStream inputStream = new FileInputStream(new File(rootDir, "local.properties"))
+prop.load(inputStream)
+inputStream.close()
+
 android {
+    signingConfigs {
+        debug {
+            storeFile file(prop.getProperty("localStoreFile"))
+            storePassword prop.getProperty("localStorePassword")
+            keyAlias prop.getProperty("localKeyAlias")
+            keyPassword prop.getProperty("localStorePassword")
+        }
+    }
     compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
         applicationId "com.bige0.shadowsocksr"
@@ -12,11 +25,16 @@ android {
         multiDexEnabled true
         proguardFiles
         vectorDrawables.useSupportLibrary = true
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     sourceSets {
@@ -39,12 +57,10 @@ android {
         }
     }
     namespace 'com.bige0.shadowsocksr'
-
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
     implementation 'androidx.appcompat:appcompat:1.4.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
@@ -63,8 +79,4 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     implementation "com.google.code.findbugs:jsr305:3.0.2"
     implementation 'com.google.android.material:material:1.4.0'
-}
-
-repositories {
-    mavenCentral()
 }

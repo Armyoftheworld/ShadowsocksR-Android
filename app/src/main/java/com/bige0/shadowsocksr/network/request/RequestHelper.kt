@@ -246,7 +246,6 @@ class RequestHelper private constructor(builder: OkHttpClient.Builder? = null)
 
 	companion object
 	{
-
 		private var sInstance: RequestHelper? = null
 		private val mDefaultBuilder: OkHttpClient.Builder = OkHttpClient.Builder()
 			.connectTimeout(5, TimeUnit.SECONDS)
@@ -254,6 +253,11 @@ class RequestHelper private constructor(builder: OkHttpClient.Builder? = null)
 			.readTimeout(5, TimeUnit.SECONDS)
 			.followRedirects(false)
 			.followSslRedirects(false)
+			// 忽略证书验证
+			.sslSocketFactory(
+				SSLHelper.getTrustAllSSLSocketFactory(),
+				SSLHelper.getTrustAllManager()
+			).hostnameVerifier { _, _ -> true }
 
 		/**
 		 * init
@@ -283,8 +287,3 @@ class RequestHelper private constructor(builder: OkHttpClient.Builder? = null)
 		}
 	}
 }
-/**
- * init
- *
- * @see .init
- */
